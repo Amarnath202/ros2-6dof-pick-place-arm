@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- arm_bringup/package.xml -->
+<package format="3">
+  <name>arm_bringup</name>
+  <version>1.0.0</version>
+  <description>
+    Master bringup package for the 6-DOF robotic arm simulation.
+    Provides a single launch file that starts the complete system:
+    Gazebo + MoveIt2 + Vision + Control.
+  </description>
+
+  <maintainer email="user@example.com">Developer</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>arm_description</depend>
+  <depend>arm_moveit_config</depend>
+  <depend>arm_gazebo</depend>
+  <depend>arm_control</depend>
+  <depend>arm_vision</depend>
+  <depend>gazebo_ros</depend>
+  <depend>rviz2</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -1,0 +1,105 @@
+# arm_moveit_config/config/planning_pipelines/ompl_planning.yaml
+# ============================================================
+# OMPL planning pipeline configuration for MoveIt2.
+# OMPL is the Open Motion Planning Library — the default planner.
+# Defines planner-specific parameters for each planning group.
+# ============================================================
+
+planning_plugin: ompl_interface/OMPLPlanner
+
+# ── Request adapter pipeline ──────────────────────────────────────────
+# These adapters pre/post-process motion planning requests:
+#   AddTimeParameterization: adds time stamps to trajectories
+#   ResolveConstraintFrames: handles constraint frames
+#   FixWorkspaceBounds: enforces workspace boundaries
+#   FixStartStateBounds: clamps start state to joint limits
+#   FixStartStateCollision: adjusts start state if in collision
+#   FixStartStatePathConstraints: adjusts start for path constraints
+request_adapters: >-
+  default_planner_request_adapters/AddTimeOptimalParameterization
+  default_planner_request_adapters/ResolveConstraintFrames
+  default_planner_request_adapters/FixWorkspaceBounds
+  default_planner_request_adapters/FixStartStateBounds
+  default_planner_request_adapters/FixStartStateCollision
+  default_planner_request_adapters/FixStartStatePathConstraints
+
+# Start state error tolerance
+start_state_max_bounds_error: 0.1
+
+# ── Planning group configurations ──────────────────────────────────────
+arm:
+  # ── Available planners for the arm group ──────────────────────────
+  planner_configs:
+    - RRTConnectkConfigDefault
+    - RRTkConfigDefault
+    - RRTstarConfigDefault
+    - ESTkConfigDefault
+    - BKPIECEkConfigDefault
+    - LBKPIECEkConfigDefault
+    - BITstarkConfigDefault
+    - PRMstarkConfigDefault
+
+  # Default planner for arm planning requests
+  default_planner_config: RRTConnectkConfigDefault
+
+  # Projection evaluator (for EST and similar planners)
+  projection_evaluator: joints(joint1,joint2)
+
+  # Maximum number of planning attempts
+  num_planning_attempts: 10
+
+  # Planning time limit (seconds)
+  planning_time: 5.0
+
+  # Maximum Cartesian path resolution (for computeCartesianPath)
+  max_cartesian_speed: 0.5
+
+gripper:
+  planner_configs:
+    - RRTConnectkConfigDefault
+    - RRTkConfigDefault
+  default_planner_config: RRTConnectkConfigDefault
+  num_planning_attempts: 5
+  planning_time: 2.0
+
+# ── Global planner configurations ─────────────────────────────────────
+planner_configs:
+
+  RRTConnectkConfigDefault:
+    type: geometric::RRTConnect
+    range: 0.0       # 0.0 = auto
+
+  RRTkConfigDefault:
+    type: geometric::RRT
+    range: 0.0
+    goal_bias: 0.05
+
+  RRTstarConfigDefault:
+    type: geometric::RRTstar
+    range: 0.0
+    goal_bias: 0.05
+    delay_collision_checking: 1
+
+  ESTkConfigDefault:
+    type: geometric::EST
+    range: 0.0
+    goal_bias: 0.05
+
+  BKPIECEkConfigDefault:
+    type: geometric::BKPIECE
+    range: 0.0
+    border_fraction: 0.9
+    failed_expansion_score_factor: 0.5
+    min_valid_path_fraction: 0.5
+
+  LBKPIECEkConfigDefault:
+    type: geometric::LBKPIECE
+    range: 0.0
+    border_fraction: 0.9
+    min_valid_path_fraction: 0.5
+
+  BITstarkConfigDefault:
+    type: geometric::BITstar
+
+  PRMstarkConfigDefault:
+    type: geometric::PRMstar

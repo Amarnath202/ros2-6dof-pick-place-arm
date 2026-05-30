@@ -1,0 +1,46 @@
+# arm_vision/config/vision_params.yaml
+# ============================================================
+# Configuration parameters for all vision nodes.
+# ============================================================
+
+color_detector_node:
+  ros__parameters:
+    target_color: "red"
+    image_topic: "/overhead_camera_sensor/image_raw"
+    camera_info_topic: "/overhead_camera_sensor/camera_info"
+    camera_frame: "overhead_camera_optical_frame"
+    publish_annotated: true
+    object_height_assumption: 0.05
+
+coord_transformer_node:
+  ros__parameters:
+    # Transform detections into this frame
+    target_frame: "world"
+
+    # Source frame
+    source_frame: "overhead_camera_link"
+
+    # Known table height (meters)
+    table_z: 0.45
+
+    # Override Z coordinate with known table height
+    # Set to false to use depth-estimated Z
+    use_table_z: true
+
+    # Object height offset above table surface
+    z_offset: 0.025
+
+camera_tf_broadcaster_node:
+  ros__parameters:
+    # Is camera wrist-mounted? (TF already in URDF)
+    is_wrist_mounted: false
+
+    # For overhead camera only:
+    camera_frame: "overhead_camera_link"
+    parent_frame: "world"
+    x: 0.28
+    y: 0.0
+    z: 1.2
+    roll: 0.0
+    pitch: 1.5708   # pi/2 = pointing down
+    yaw: 0.0

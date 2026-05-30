@@ -1,0 +1,46 @@
+# arm_moveit_config/config/moveit_controllers.yaml
+# ============================================================
+# Defines which ROS2 action servers MoveIt2 uses to execute
+# planned trajectories. These must match the controller names
+# in ros2_controllers.yaml.
+# ============================================================
+
+moveit_simple_controller_manager:
+  controller_names:
+    - arm_controller
+    - gripper_controller
+
+  arm_controller:
+    # This is a joint trajectory controller action server
+    type: FollowJointTrajectory
+
+    # The action server namespace
+    action_ns: follow_joint_trajectory
+
+    # Default timeout waiting for controller server
+    default_goal_duration_constraint: 0.0
+
+    # Joint names controlled by this controller (must match SRDF arm group)
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - joint5
+      - joint6
+
+  gripper_controller:
+    # Gripper uses GripperCommand action interface
+    type: GripperCommand
+
+    # Action server namespace for gripper
+    action_ns: gripper_cmd
+
+    # The joint commanded by the gripper action
+    # Both fingers are commanded via left_finger_joint
+    joints:
+      - left_finger_joint
+      - right_finger_joint
+
+# ── Controller manager settings ──────────────────────────────────────
+moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager

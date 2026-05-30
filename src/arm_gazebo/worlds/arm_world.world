@@ -1,0 +1,289 @@
+<?xml version="1.0"?>
+<!--
+  arm_gazebo/worlds/arm_world.world
+  Gazebo Classic simulation world for the 6-DOF robotic arm.
+
+  World includes:
+    - Sunlight + ambient lighting
+    - Ground plane
+    - Wooden table for the arm to work on
+    - Two pick objects with text labels (boxes)
+    - Place zone marked with a colored pad
+    - Physics settings for stable simulation
+-->
+<sdf version="1.6">
+  <world name="arm_world">
+
+    <!-- ── Gravity ────────────────────────────────────────────────── -->
+    <gravity>0 0 -9.81</gravity>
+
+    <!-- ── Physics engine settings ───────────────────────────────── -->
+    <!-- ODE: Open Dynamics Engine, default for Gazebo Classic -->
+    <physics type="ode" default="true">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>300</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.0</sor>
+        </solver>
+        <constraints>
+          <cfm>1e-5</cfm>
+          <erp>0.2</erp>
+          <contact_max_correcting_vel>0.1</contact_max_correcting_vel>
+          <contact_surface_layer>0.002</contact_surface_layer>
+        </constraints>
+      </ode>
+    </physics>
+
+    <!-- ── Sunlight ───────────────────────────────────────────────── -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- ── Ground Plane ───────────────────────────────────────────── -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- ── Ambient Scene Settings ─────────────────────────────────── -->
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <sky>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <shadows>true</shadows>
+    </scene>
+
+    <!-- ── Worktable ───────────────────────────────────────────────── -->
+    <!-- A 0.3x0.8x0.30 m table supporting the robot base and workspace -->
+    <model name="worktable">
+      <static>true</static>
+      <pose>0.45 0 0.15 0 0 0</pose>
+      <link name="table_link">
+        <collision name="table_collision">
+          <geometry>
+            <box><size>0.60 0.60 0.30</size></box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.8</mu>
+                <mu2>0.8</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="table_visual">
+          <geometry>
+            <box><size>0.60 0.60 0.30</size></box>
+          </geometry>
+          <material>
+            <ambient>0.55 0.35 0.1 1</ambient>
+            <diffuse>0.55 0.35 0.1 1</diffuse>
+          </material>
+        </visual>
+        <inertial>
+          <mass>20.0</mass>
+          <inertia>
+            <ixx>1.067</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>1.717</iyy><iyz>0</iyz>
+            <izz>2.667</izz>
+          </inertia>
+        </inertial>
+      </link>
+    </model>
+
+    <!-- ── Overhead Camera ────────────────────────────────────────── -->
+    <model name="overhead_camera">
+      <static>true</static>
+      <pose>0.28 0 1.2 0 1.5708 0</pose>
+      <link name="overhead_camera_link">
+        <visual name="visual">
+          <geometry>
+            <box><size>0.05 0.05 0.05</size></box>
+          </geometry>
+          <material>
+            <ambient>0.2 0.2 0.2 1</ambient>
+            <diffuse>0.2 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+        <sensor type="camera" name="overhead_camera_sensor">
+          <update_rate>30.0</update_rate>
+          <visualize>true</visualize>
+          <camera name="overhead_camera">
+            <horizontal_fov>1.39626</horizontal_fov>
+            <image>
+              <width>1920</width>
+              <height>1080</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.01</near>
+              <far>5.0</far>
+            </clip>
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.007</stddev>
+            </noise>
+          </camera>
+          <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+            <alwaysOn>true</alwaysOn>
+            <updateRate>30.0</updateRate>
+            <cameraName>overhead_camera</cameraName>
+            <imageTopicName>/overhead_camera/image_raw</imageTopicName>
+            <cameraInfoTopicName>/overhead_camera/camera_info</cameraInfoTopicName>
+            <frameName>overhead_camera_link</frameName>
+          </plugin>
+        </sensor>
+      </link>
+    </model>
+
+    <!-- ── Red Cube ───────────────────────────────────────────────── -->
+    <model name="red_cube">
+      <pose>0.30 0.1 0.325 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box><size>0.05 0.05 0.05</size></box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>2.0</mu>
+                <mu2>2.0</mu2>
+                <slip1>0.0</slip1>
+                <slip2>0.0</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>100000.0</kp>
+                <kd>10.0</kd>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+                <soft_cfm>0.0</soft_cfm>
+                <soft_erp>0.2</soft_erp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box><size>0.05 0.05 0.05</size></box>
+          </geometry>
+          <material>
+            <ambient>1 0 0 1</ambient>
+            <diffuse>1 0 0 1</diffuse>
+          </material>
+        </visual>
+        <inertial>
+          <mass>0.05</mass>
+          <inertia>
+            <!-- I = m/12 * (a^2 + b^2) = 0.05/12 * (0.05^2 + 0.05^2) = 0.0000208 -->
+            <ixx>0.0000208</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>0.0000208</iyy><iyz>0</iyz>
+            <izz>0.0000208</izz>
+          </inertia>
+        </inertial>
+      </link>
+    </model>
+
+    <!-- ── Blue Cube ───────────────────────────────────────────────── -->
+    <model name="blue_cube">
+      <pose>0.35 -0.1 0.325 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box><size>0.05 0.05 0.05</size></box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>2.0</mu>
+                <mu2>2.0</mu2>
+                <slip1>0.0</slip1>
+                <slip2>0.0</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>100000.0</kp>
+                <kd>10.0</kd>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+                <soft_cfm>0.0</soft_cfm>
+                <soft_erp>0.2</soft_erp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box><size>0.05 0.05 0.05</size></box>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+        <inertial>
+          <mass>0.05</mass>
+          <inertia>
+            <!-- I = m/12 * (a^2 + b^2) = 0.05/12 * (0.05^2 + 0.05^2) = 0.0000208 -->
+            <ixx>0.0000208</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>0.0000208</iyy><iyz>0</iyz>
+            <izz>0.0000208</izz>
+          </inertia>
+        </inertial>
+      </link>
+    </model>
+
+    <!-- ── Place Zone (Green Pad) ─────────────────────────────────── -->
+    <!-- Visual marker showing where the arm should place objects -->
+    <model name="place_zone">
+      <static>true</static>
+      <pose>0.35 0.2 0.301 0 0 0</pose>    <!-- on table surface -->
+      <link name="pad_link">
+        <collision name="pad_collision">
+          <geometry>
+            <box><size>0.15 0.15 0.002</size></box>
+          </geometry>
+        </collision>
+        <visual name="pad_visual">
+          <geometry>
+            <box><size>0.15 0.15 0.002</size></box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.8 0.1 0.7</ambient>
+            <diffuse>0.1 0.8 0.1 0.7</diffuse>
+          </material>
+        </visual>
+        <inertial>
+          <mass>0.01</mass>
+          <inertia>
+            <ixx>0.0000031</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>0.0000031</iyy><iyz>0</iyz>
+            <izz>0.0000056</izz>
+          </inertia>
+        </inertial>
+      </link>
+    </model>
+
+    <!-- ── GUI Camera position ────────────────────────────────────── -->
+    <gui fullscreen="0">
+      <camera name="user_camera">
+        <pose>1.0 -1.2 1.8 0 0.65 2.2</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+
+  </world>
+</sdf>

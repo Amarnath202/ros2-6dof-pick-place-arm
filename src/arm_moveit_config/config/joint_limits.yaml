@@ -1,0 +1,55 @@
+# arm_moveit_config/config/joint_limits.yaml
+# ============================================================
+# Per-joint velocity and acceleration limits for MoveIt2 planning.
+# These augment (and can override) the URDF limits.
+# ============================================================
+
+joint_limits:
+
+  joint1:
+    has_velocity_limits: true
+    max_velocity: 2.0          # rad/s
+    has_acceleration_limits: true
+    max_acceleration: 5.0      # rad/s^2
+
+  joint2:
+    has_velocity_limits: true
+    max_velocity: 2.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0
+
+  joint3:
+    has_velocity_limits: true
+    max_velocity: 2.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0
+
+  joint4:
+    has_velocity_limits: true
+    max_velocity: 3.0
+    has_acceleration_limits: true
+    max_acceleration: 8.0
+
+  joint5:
+    has_velocity_limits: true
+    max_velocity: 3.0
+    has_acceleration_limits: true
+    max_acceleration: 8.0
+
+  joint6:
+    has_velocity_limits: true
+    max_velocity: 3.0
+    has_acceleration_limits: true
+    max_acceleration: 8.0
+
+  left_finger_joint:
+    has_velocity_limits: true
+    max_velocity: 0.5
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+
+  right_finger_joint:
+    has_velocity_limits: true
+    max_velocity: 0.5
+    has_acceleration_limits: true
+    max_acceleration: 1.0

@@ -1,0 +1,14 @@
+build/
+install/
+log/
+
+__pycache__/
+*.pyc
+
+.vscode/
+.idea/
+
+*.swp
+
+yolov8n.pt
+src/gazebo_ros2_control/

@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<!--
+  arm_moveit_config/config/arm.srdf
+  Semantic Robot Description Format (SRDF) for MoveIt2.
+
+  Defines:
+    - Planning groups (arm, gripper)
+    - End effector
+    - Virtual joints
+    - Passive joints
+    - Allowed collision matrix (ACM) — disable self-collision between
+      adjacent links and links that can never collide
+    - Named robot states (home, ready, gripper_open, gripper_close)
+-->
+<robot name="arm">
+
+  <!-- ── Virtual Joint: world frame -> base_link ───────────────────────── -->
+  <!-- Tells MoveIt2 how the robot is anchored in the world -->
+  <virtual_joint name="virtual_joint"
+                 type="fixed"
+                 parent_frame="world"
+                 child_link="base_link"/>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       PLANNING GROUP: arm
+       6-DOF kinematic chain from base_link to tool0
+       Uses KDL kinematics plugin
+       ══════════════════════════════════════════════════════════════════ -->
+  <group name="arm">
+    <!-- Chain definition: start -> end link -->
+    <chain base_link="base_link" tip_link="tool0"/>
+  </group>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       PLANNING GROUP: gripper
+       Controls both finger joints together
+       ══════════════════════════════════════════════════════════════════ -->
+  <group name="gripper">
+    <joint name="left_finger_joint"/>
+    <joint name="right_finger_joint"/>
+  </group>
+
+  <!-- ── End Effector definition ───────────────────────────────────────── -->
+  <!-- Tells MoveIt2 which group is the end effector and where it attaches -->
+  <end_effector name="gripper_ee"
+                parent_link="tool0"
+                group="gripper"
+                parent_group="arm"/>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       NAMED ROBOT STATES
+       Predefined joint configurations for easy motion planning
+       ══════════════════════════════════════════════════════════════════ -->
+
+  <!-- Home position: elbow-up, wrist-down scan configuration -->
+  <group_state name="home" group="arm">
+    <joint name="joint1" value="0"/>
+    <joint name="joint2" value="-1.5708"/>
+    <joint name="joint3" value="1.5708"/>
+    <joint name="joint4" value="0"/>
+    <joint name="joint5" value="-1.5708"/>
+    <joint name="joint6" value="0"/>
+  </group_state>
+
+  <!-- Ready position: arm extended horizontally, ready to pick -->
+  <group_state name="ready" group="arm">
+    <joint name="joint1" value="0"/>
+    <joint name="joint2" value="-0.5236"/>  <!-- -30 degrees -->
+    <joint name="joint3" value="1.0472"/>   <!-- +60 degrees -->
+    <joint name="joint4" value="0"/>
+    <joint name="joint5" value="-0.5236"/>  <!-- -30 degrees -->
+    <joint name="joint6" value="0"/>
+  </group_state>
+
+  <!-- Folded: compact position for safe transport -->
+  <group_state name="folded" group="arm">
+    <joint name="joint1" value="0"/>
+    <joint name="joint2" value="1.5708"/>   <!-- +90 degrees up -->
+    <joint name="joint3" value="-2.0944"/>  <!-- -120 degrees -->
+    <joint name="joint4" value="0"/>
+    <joint name="joint5" value="-1.5708"/>  <!-- -90 degrees -->
+    <joint name="joint6" value="0"/>
+  </group_state>
+
+  <!-- Gripper fully open -->
+  <group_state name="gripper_open" group="gripper">
+    <joint name="left_finger_joint" value="0.04"/>
+    <joint name="right_finger_joint" value="0.04"/>
+  </group_state>
+
+  <!-- Gripper fully closed -->
+  <group_state name="gripper_close" group="gripper">
+    <joint name="left_finger_joint" value="0.0"/>
+    <joint name="right_finger_joint" value="0.0"/>
+  </group_state>
+
+  <!-- Gripper half open (for delicate objects) -->
+  <group_state name="gripper_half_open" group="gripper">
+    <joint name="left_finger_joint" value="0.02"/>
+    <joint name="right_finger_joint" value="0.02"/>
+  </group_state>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       PASSIVE JOINTS
+       Joints not controlled by MoveIt2 directly (if any mimic joints)
+       ══════════════════════════════════════════════════════════════════ -->
+  <!-- No passive joints in this configuration -->
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       ALLOWED COLLISION MATRIX (ACM)
+       Disables collision checking between link pairs that either:
+         1. Are adjacent (connected by a joint)
+         2. Can geometrically never collide
+       This dramatically speeds up collision checking.
+       ══════════════════════════════════════════════════════════════════ -->
+
+  <!-- world <-> base_link: always fixed, never collide -->
+  <disable_collisions link1="world" link2="base_link" reason="Adjacent"/>
+
+  <!-- base_link <-> link1: connected by joint1 -->
+  <disable_collisions link1="base_link" link2="link1" reason="Adjacent"/>
+
+  <!-- link1 <-> link2: connected by joint2 -->
+  <disable_collisions link1="link1" link2="link2" reason="Adjacent"/>
+
+  <!-- link2 <-> link3: connected by joint3 -->
+  <disable_collisions link1="link2" link2="link3" reason="Adjacent"/>
+
+  <!-- link3 <-> link4: connected by joint4 -->
+  <disable_collisions link1="link3" link2="link4" reason="Adjacent"/>
+
+  <!-- link4 <-> link5: connected by joint5 -->
+  <disable_collisions link1="link4" link2="link5" reason="Adjacent"/>
+
+  <!-- link5 <-> link6: connected by joint6 -->
+  <disable_collisions link1="link5" link2="link6" reason="Adjacent"/>
+
+  <!-- link6 <-> gripper_base_link: fixed joint -->
+  <disable_collisions link1="link6" link2="gripper_base_link" reason="Adjacent"/>
+
+  <!-- gripper_base_link <-> left_finger_link -->
+  <disable_collisions link1="gripper_base_link" link2="left_finger_link" reason="Adjacent"/>
+
+  <!-- gripper_base_link <-> right_finger_link -->
+  <disable_collisions link1="gripper_base_link" link2="right_finger_link" reason="Adjacent"/>
+
+  <!-- Non-adjacent but geometrically impossible collisions -->
+  <disable_collisions link1="base_link" link2="link2" reason="Never"/>
+  <disable_collisions link1="link1" link2="link3" reason="Never"/>
+  <disable_collisions link1="link2" link2="link4" reason="Never"/>
+  <disable_collisions link1="link3" link2="link5" reason="Never"/>
+  <disable_collisions link1="link4" link2="link6" reason="Never"/>
+  <disable_collisions link1="link5" link2="gripper_base_link" reason="Never"/>
+  <disable_collisions link1="link6" link2="left_finger_link" reason="Never"/>
+  <disable_collisions link1="link6" link2="right_finger_link" reason="Never"/>
+  <disable_collisions link1="link6" link2="camera_link" reason="Adjacent"/>
+  <disable_collisions link1="left_finger_link" link2="right_finger_link" reason="Never"/>
+  <disable_collisions link1="link3" link2="link6" reason="Never"/>
+  <disable_collisions link1="link3" link2="gripper_base_link" reason="Never"/>
+  <disable_collisions link1="link3" link2="left_finger_link" reason="Never"/>
+  <disable_collisions link1="link3" link2="right_finger_link" reason="Never"/>
+  <disable_collisions link1="link3" link2="camera_link" reason="Never"/>
+  <disable_collisions link1="gripper_base_link" link2="debug_open_marker" reason="Adjacent"/>
+  <disable_collisions link1="gripper_base_link" link2="debug_closed_marker" reason="Adjacent"/>
+  <disable_collisions link1="left_finger_link" link2="debug_open_marker" reason="Never"/>
+  <disable_collisions link1="left_finger_link" link2="debug_closed_marker" reason="Never"/>
+  <disable_collisions link1="right_finger_link" link2="debug_open_marker" reason="Never"/>
+  <disable_collisions link1="right_finger_link" link2="debug_closed_marker" reason="Never"/>
+  <disable_collisions link1="debug_open_marker" link2="debug_closed_marker" reason="Never"/>
+  <disable_collisions link1="link2" link2="gripper_base_link" reason="Never"/>
+  <disable_collisions link1="link2" link2="left_finger_link" reason="Never"/>
+  <disable_collisions link1="link2" link2="right_finger_link" reason="Never"/>
+  <disable_collisions link1="link2" link2="tool0" reason="Never"/>
+
+  <!-- Finger links can never collide with base_link or link1 in any pick pose -->
+  <disable_collisions link1="base_link" link2="left_finger_link" reason="Never"/>
+  <disable_collisions link1="base_link" link2="right_finger_link" reason="Never"/>
+  <disable_collisions link1="base_link" link2="gripper_base_link" reason="Never"/>
+  <disable_collisions link1="base_link" link2="tool0" reason="Never"/>
+  <disable_collisions link1="link1" link2="right_finger_link" reason="Never"/>
+  <disable_collisions link1="link1" link2="gripper_base_link" reason="Never"/>
+  <disable_collisions link1="link1" link2="tool0" reason="Never"/>
+
+  <!-- tool0 is a massless frame; disable with all arm links -->
+  <disable_collisions link1="tool0" link2="gripper_base_link" reason="Adjacent"/>
+  <disable_collisions link1="tool0" link2="left_finger_link" reason="Never"/>
+  <disable_collisions link1="tool0" link2="right_finger_link" reason="Never"/>
+  <disable_collisions link1="tool0" link2="link6" reason="Never"/>
+  <disable_collisions link1="tool0" link2="link5" reason="Never"/>
+  <disable_collisions link1="tool0" link2="link4" reason="Never"/>
+  <disable_collisions link1="tool0" link2="link3" reason="Never"/>
+  <disable_collisions link1="tool0" link2="link1" reason="Never"/>
+</robot>

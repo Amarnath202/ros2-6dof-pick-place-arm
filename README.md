@@ -250,6 +250,12 @@ ros2 topic echo /detected_object_pose
 
 ---
 
+**Demo Video and Screenshots**
+Video:  https://drive.google.com/file/d/15pcy869klUqO2WLYAe_hjW-puLjh-joK/view?usp=sharing
+Image 1: https://drive.google.com/file/d/1MKZ30yjYxbI8aT7_V0dzdusUC2QNTliX/view?usp=drive_link
+Image 2: https://drive.google.com/file/d/1jLnwR9LPGp2wj7ToAB6-Z_PBMJNKxp1U/view?usp=drive_link
+Image 3: https://drive.google.com/file/d/1TKB4nbcMhTHNqV7djAoYaD9hJnfn-KhO/view?usp=drive_link
+
 # 👨‍💻 Author
 
 ### Amarnath A
